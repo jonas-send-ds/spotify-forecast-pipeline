@@ -19,21 +19,21 @@ def load_data() -> (pl.DataFrame, pl.DataFrame):
     containing the most recent data for each artist.
 
     :return: A tuple containing two datasets:
-        - df_training: processed dataset for training, with null values removed
+        - df_train: processed dataset for training, with null values removed
         - df_latest: dataset containing the most recent data for each artist
     """
     # df_spreadsheet = load_spreadsheet_data(ARTISTS.keys())  # TODO #11: is spreadsheet data sufficiently more up-to-date to justify additional complexity?
     df = load_songstats_data(ARTISTS).select(["date", "artist", "monthly_listeners", "reach"])
     df = add_features(df)
 
-    df_training = df.drop_nulls()
+    df_train = df.drop_nulls()
     df_latest = (df
                  .sort("date")
                  .with_columns(pl.all().fill_null(strategy="forward").over("artist"))
                  .group_by("artist")
                  .last())
 
-    print(f"Training data available from {df_training["date"].min()} to {df_training['date'].max()} for {len(df_training["artist"].unique())} artists")
+    print(f"Training data available from {df_train["date"].min()} to {df_train['date'].max()} for {len(df_train["artist"].unique())} artists")
     print(f"Latest data available from {df_latest['date'].min()} to {df_latest['date'].max()} for {len(df_latest)} artists")
 
-    return df_training, df_latest
+    return df_train, df_latest
