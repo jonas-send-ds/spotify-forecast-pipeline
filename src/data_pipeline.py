@@ -33,4 +33,7 @@ def load_data() -> (pl.DataFrame, pl.DataFrame):
                  .group_by("artist")
                  .last())
 
+    print(f"Training data available from {df_training["date"].min()} to {df_training['date'].max()} for {len(df_training["artist"].unique())} artists")
+    print(f"Latest data available from {df_latest['date'].min()} to {df_latest['date'].max()} for {len(df_latest)} artists")
+
     return df_training, df_latest
