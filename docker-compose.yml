@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  spotify-forecast-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spotify-forecast-app
+    container_name: spotify-forecast-app
+    ports:
+      - "8000:8000"
