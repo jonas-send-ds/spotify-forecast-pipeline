@@ -13,9 +13,9 @@ def main() -> None:
     :return: None
     """
     df_train, df_latest = load_data()
-    persist_latest_data_to_s3(df_latest)
     df_forecast = forecast(df_train, df_latest)
     update_spreadsheet(df_forecast)
+    persist_latest_data_to_s3(df_latest)
 
     print("Done!")
 
