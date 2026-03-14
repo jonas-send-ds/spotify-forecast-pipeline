@@ -45,9 +45,9 @@ def load_songstats_data(artists: dict[str, str]) -> pl.DataFrame:
 
     df = fix_anomalies(df)
 
-    # We interpret the values as lagged by one day
+    # We interpret the monthly listeners values as lagged by one day
     return df.with_columns(
-        pl.col("date") - pl.duration(days=1)
+        pl.col("monthly_listeners").shift(-1).over("artist")
     )
 
 

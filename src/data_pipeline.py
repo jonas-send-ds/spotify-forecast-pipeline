@@ -3,7 +3,7 @@ import polars as pl
 
 from src.feature_engineering import add_features
 from src.songstats_data import load_songstats_data
-# from src.spreadsheet_data import load_spreadsheet_data
+from src.spreadsheet_data import load_spreadsheet_data
 
 # artists with their songstats ID
 ARTISTS = {
@@ -22,8 +22,18 @@ def load_data() -> (pl.DataFrame, pl.DataFrame):
         - df_train: processed dataset for training, with null values removed
         - df_latest: dataset containing the most recent data for each artist
     """
-    # df_spreadsheet = load_spreadsheet_data(ARTISTS.keys())  # TODO #11: is spreadsheet data sufficiently more up-to-date to justify additional complexity?
-    df = load_songstats_data(ARTISTS).select(["date", "artist", "monthly_listeners", "reach"])
+    df_songstats = load_songstats_data(ARTISTS).select(["date", "artist", "monthly_listeners", "reach"])
+    df_spreadsheet = load_spreadsheet_data(ARTISTS.keys())
+
+    df = pl.concat([df_songstats, df_spreadsheet], how="diagonal_relaxed")
+
+    # use monthly listeners data from spreadsheet (when available) and songstats data for reach
+    df = (df.group_by(["date", "artist"]).agg(
+              pl.col("monthly_listeners").last(),
+              pl.col("reach").first(),
+          ).sort(["date", "artist"]))
+
+
     df = add_features(df)
 
     df_train = df.drop_nulls()

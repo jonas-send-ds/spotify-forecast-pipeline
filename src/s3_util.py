@@ -17,6 +17,7 @@ def persist_latest_data_to_s3(df_latest: pl.DataFrame) -> None:
     :param df_latest: DataFrame containing the latest data to persist.
     :raises ValueError: If the S3_BUCKET_NAME environment variable is not set.
     """
+    print("Persisting latest data to S3...")
     load_dotenv()
     bucket = os.getenv("S3_BUCKET_NAME")
     if bucket is None:

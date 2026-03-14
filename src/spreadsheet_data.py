@@ -13,9 +13,6 @@ PRIVATE_KEY_IS_NOT_SET = "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY environment variabl
 SPREADSHEET_ID = "167UTVu2XVAM0MlGw-Cpw0tcMyuphC3ifJpOiC_y_a74"
 
 
-# TODO #11: Is the spreadsheet data sufficiently more up-to-date to justify added complexity?
-
-
 def get_credentials() -> dict:
     """
     Retrieve the Google service account credentials.
