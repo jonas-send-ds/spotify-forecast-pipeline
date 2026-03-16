@@ -5,6 +5,8 @@ from src.feature_engineering import add_features
 from src.songstats_data import load_songstats_data
 from src.spreadsheet_data import load_spreadsheet_data
 
+# TODO #15: make coupling with trigger explicit and avoid copied code
+
 # artists with their songstats ID
 ARTISTS = {
     "Bad Bunny": "xmcd3klh",
@@ -23,11 +25,16 @@ def load_data() -> (pl.DataFrame, pl.DataFrame):
         - df_latest: dataset containing the most recent data for each artist
     """
     df_songstats = load_songstats_data(ARTISTS).select(["date", "artist", "monthly_listeners", "reach"])
+
+    # drop rows where both listeners and reach are null
+    df_songstats = df_songstats.filter(~(pl.col("monthly_listeners").is_null() & pl.col("reach").is_null()))
+
     df_spreadsheet = load_spreadsheet_data(ARTISTS.keys())
 
     df = pl.concat([df_songstats, df_spreadsheet], how="diagonal_relaxed")
 
     # use monthly listeners data from spreadsheet (when available) and songstats data for reach
+    # TODO: make more robust to sorting of dataframes
     df = (df.group_by(["date", "artist"]).agg(
               pl.col("monthly_listeners").last(),
               pl.col("reach").first(),
